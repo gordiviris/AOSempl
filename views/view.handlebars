@@ -1,0 +1,49 @@
+<h1>View Employees</h1>
+<p>{{message}}</p>
+
+{{#if error}}
+    <div class="error" style="color: red; font-weight: bold;">
+        {{error}}
+    </div>
+{{/if}}
+
+{{#if employees.length}}
+    <table>
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Department</th>
+                <th>Start Date</th>
+                <th>Job Title</th>
+                <th>Salary</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each employees}}
+            <tr>
+                <td>{{this.firstName}}</td>
+                <td>{{this.lastName}}</td>
+                <td>{{this.department}}</td>
+                <td>{{formatDate this.startDate}}</td>
+                <td>{{this.jobTitle}}</td>
+                <td>{{formatSalary this.salary}}</td>
+                <td>
+                    <a href="/updateemployee/{{this._id}}" class="btn btn-edit">
+                        <i class="fas fa-edit"></i> 
+                    </a>
+                </td>
+                <td>
+                    <a href="/deleteemployee/{{this._id}}" class="btn btn-edit">
+                        <i class="fas fa-trash-alt"></i> 
+                    </a>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+{{else}}
+    <p>No Employees Found</p>
+{{/if}}
