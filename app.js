@@ -74,7 +74,8 @@ app.use("/", require("./routes/auth").router);
 app.use("/", require("./routes/crud"));
 
 //MongoDB Database connection
-const mongoURI = "mongodb://localhost:27017/Empl"
+const mongoURILocal = "mongodb://localhost:27017/Empl"
+const mongoURI = "mongodb+srv://andradekevin01:M4T50TmxZdsUuqMh@aosempl.wxhug.mongodb.net/?retryWrites=true&w=majority&appName=aosempl"
 mongoose.connect(mongoURI);
 const db = mongoose.connection;
 //check for connection
