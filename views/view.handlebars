@@ -6,7 +6,8 @@
         {{error}}
     </div>
 {{/if}}
-
+<a href="/" class="btn btn-home">Add New Employee</a>
+<br>
 {{#if employees.length}}
     <table>
         <thead>
@@ -31,13 +32,13 @@
                 <td>{{this.jobTitle}}</td>
                 <td>{{formatSalary this.salary}}</td>
                 <td>
-                    <a href="/updateemployee/{{this._id}}" class="btn btn-edit">
-                        <i class="fas fa-edit"></i> 
+                    <a href="/update/{{this._id}}" class="btn btn-edit">
+                        <i class="fas fa-edit"></i> Edit
                     </a>
                 </td>
                 <td>
-                    <a href="/deleteemployee/{{this._id}}" class="btn btn-edit">
-                        <i class="fas fa-trash-alt"></i> 
+                    <a href="/delete/{{this._id}}" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this employee?');">
+                        <i class="fas fa-trash-alt"></i> Delete
                     </a>
                 </td>
             </tr>

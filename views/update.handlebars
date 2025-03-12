@@ -1,0 +1,43 @@
+<h1>Update Employee</h1>
+    <p>{{message}}</p>
+
+    {{#if error}}
+        <div class="error" style="color: red; font-weight: bold;">
+            {{error}}
+        </div>
+    {{/if}}
+    <a href="/view" class="btn btn-home">Back to Employee List</a>
+    <br>
+<form action="/update/{{employee._id}}" method="POST">
+        <div>
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" value="{{employee.firstName}}" required>
+        </div>
+        <div>
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" value="{{employee.lastName}}" required>
+        </div>
+        <div>
+            <label for="department">Department:</label>
+            <select id="department" name="department" required>
+                <option value="Manager" {{#ifEquals employee.department "Manager"}}selected{{/ifEquals}}>Manager</option>
+                <option value="IT" {{#ifEquals employee.department "IT"}}selected{{/ifEquals}}>IT</option>
+                <option value="Human Resources" {{#ifEquals employee.department "Human Resources"}}selected{{/ifEquals}}>Human Resources</option>
+            </select>
+        </div>
+        <div>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" name="startDate" value="{{formatDate employee.startDate 'YYYY-MM-DD'}}" required>
+        </div>
+        <div>
+            <label for="jobTitle">Job Title:</label>
+            <input type="text" id="jobTitle" name="jobTitle" value="{{employee.jobTitle}}" required>
+        </div>
+        <div>
+            <label for="salary">Salary:</label>
+            <input type="number" id="salary" name="salary" step="0.01" value="{{employee.salary}}" required>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-update">Update Employee</button>
+        </div>
+    </form>

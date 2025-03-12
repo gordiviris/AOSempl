@@ -10,23 +10,26 @@ const PORT = 3000;
 
 const hbs = exphbs.create({
     helpers:{
+        ifEquals: function (arg1, arg2, options) {
+            return arg1 === arg2 ? options.fn(this) : options.inverse(this);
+        },
         formatSalary: (salary) => {
             return `$${parseFloat(salary).toFixed(2)}`;
         },
         formatDate: (date) => {
             const d = new Date(date);
-            const month = String(d.getMonth() + 1).padStart(2, '0'); 
-            const day = String(d.getDate()).padStart(2, '0'); 
-            const year = d.getFullYear(); 
-            return `${month}/${day}/${year}`;
-        }
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        },
     }
 })
 
 //set handlebars as our templating engine
 app.engine("handlebars", hbs.engine);
 app.set("view engine", "handlebars");
-app.set("views", "./views");
+app.set("views", path.join(__dirname, "views"));
 
 //sets our static resources folder
 app.use(express.static(path.join(__dirname,"public")));
@@ -64,7 +67,7 @@ app.get("/", (req, res)=>{
     res.render("index",{
         title: "Add a new Employee",
         message:"Please enter employee's information below."
-    })
+    });
 });
 
 //POST new employee
@@ -115,26 +118,45 @@ app.get("/viewemployees", async(req,res)=>{
 //-------------------------------------------------------------------------------------
 
 //update employee
-app.get("/update", (req, res)=>{
-    res.render("update",{
-        title: "Update Employee Information",
-        message:"Update Information below"
-    })
+// app.get("/update", (req, res)=>{
+//     res.render("update",{
+//         title: "Update Employee Information",
+//         message:"Update Information below"
+//     })
+// });
+//get employee info to fill in form
+app.get("/update/:id", async (req, res) => {
+    try {
+        const employee = await Employee.findById(req.params.id).lean();
+        res.render("update", {
+            title: "Update Employee Information",
+            message: "Update the information below",
+            employee,
+        });
+    } catch (err) {
+        res.status(500).send("Error fetching employee data");
+    }
 });
 
-//PUT update employee
-app.put("/updateemployee", async(req,res)=>{
-    try{
-        const updatedemployee = await Employee.findByIdAndUpdate(req.params.id, req.body,{
-            new:true,
-            runValidators:true
-        });
-        if (!updatedemployee) {
-            return res.status(404).json({ error: "Employee not found" });
+//POST update employee
+app.post("/update/:id", async (req, res) => {
+    try {
+        const updatedEmployee = await Employee.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true }
+        );
+        if (!updatedEmployee) {
+            return res.status(404).send("Employee not found");
         }
-        res.json(updatedemployee);
-    }catch(err){
-        res.status(400).json({error:"Failed to update employee"});
+        res.redirect("/view"); 
+    } catch (err) {
+        res.status(400).render("update", {
+            title: "Update Employee",
+            message: "Failed to update employee. Please try again.",
+            error: err.message,
+            employee: req.body, 
+        });
     }
 });
 
@@ -142,27 +164,42 @@ app.put("/updateemployee", async(req,res)=>{
 //-------------------------------------------------------------------------------------
 
 //delete employee
-app.get("/delete", (req, res)=>{
-    res.render("delete",{
-        title: "Delete Employee",
-        message:"Are you sure you want to deletethis employee?"
-    })
-});
+// app.get("/delete", (req, res)=>{
+//     res.render("delete",{
+//         title: "Delete Employee",
+//         message:"Are you sure you want to deletethis employee?"
+//     })
+// });
 
 //DELETE employee
-app.delete("/deleteemployee", async(req,res)=>{
-    try{
-        const employeename = req.query;
-        const employee = await Employee.find(employeename);
+// app.delete("/deleteemployee", async(req,res)=>{
+//     try{
+//         const employeename = req.query;
+//         const employee = await Employee.find(employeename);
 
-        if(employee.length === 0){
-            return res.status(404).json({error:"Failed to find employee"});
+//         if(employee.length === 0){
+//             return res.status(404).json({error:"Failed to find employee"});
+//         }
+//         const deletedEmployee = await Employee.findOneAndDelete(employeename);
+//         res.json({message: "Employee deleted successfully"})
+//     }catch(err){
+//         console.error(err);
+//         res.status(404).json({error:"Employee not found"});
+//     }
+// });
+
+app.get("/delete/:id", async (req, res) => {
+    try {
+        const deletedEmployee = await Employee.findByIdAndDelete(req.params.id);
+        if (!deletedEmployee) {
+            return res.status(404).send("Employee not found");
         }
-        const deletedEmployee = await Employee.findOneAndDelete(employeename);
-        res.json({message: "Employee deleted successfully"})
-    }catch(err){
-        console.error(err);
-        res.status(404).json({error:"Employee not found"});
+        res.render("delete", {
+            title: "Delete Employee",
+            message: "Employee deleted successfully!",
+        });
+    } catch (err) {
+        res.status(500).send("Error deleting employee");
     }
 });
 
